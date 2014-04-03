@@ -7,4 +7,4 @@ Designed as a cli version of rcon for Quake 2, but it should work for most of th
 
 To compile: 
 
-# cc -o qcmd qcmd.c
+# gcc -o qcmd qcmd.c
