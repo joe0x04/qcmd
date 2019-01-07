@@ -4,10 +4,20 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+
+#if defined(_WIN32) || defined(_WIN64)
+
+#define AI_ADDRCONFIG	0x00000400
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+
 #include <netdb.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+
+#endif
 
 #define MAXBUF 			10*1024
 #define DEFAULTPORT		"27910"
@@ -25,7 +35,7 @@ uint8_t main(int8_t argc, char **argv)
 	}
 
 	char *hostname = argv[1];
-	char *port;
+	char *port = 0;
 
 	// not an IPv6 literal address
 	if (hostname[0] != '[') {
@@ -36,6 +46,18 @@ uint8_t main(int8_t argc, char **argv)
 			hostname[strlen(hostname) - strlen(port)] = '\0';
 			*port++;	// get rid of the colon
 		}
+	} else {
+		port = strstr(hostname, "]:");
+		if (!port) {
+			port = DEFAULTPORT;
+		} else {
+			hostname[strlen(hostname) - strlen(port)] = ']';
+			hostname[strlen(hostname) - strlen(port) + 1] = '\0';
+			*port++;	// get rid of the braket and colon
+			*port++;
+		}
+
+		return 0;
 	}
 
 	struct addrinfo hints, *res = 0;
@@ -44,7 +66,7 @@ uint8_t main(int8_t argc, char **argv)
 
 	struct timeval tv;      // for socket timeout
 	tv.tv_sec = 1;          // 1 second
-	tv.tv_usec = 0;         // no microseconds
+    tv.tv_usec = 0;         // no microseconds
 	
 	memset(&hints, 0, sizeof(hints));
 	//hints.ai_family		= AF_UNSPEC;	// ipv6 then v4
