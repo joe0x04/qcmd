@@ -43,8 +43,8 @@ uint8_t main(int8_t argc, char **argv)
 	uint8_t i;
 
 	struct timeval tv;      // for socket timeout
-    tv.tv_sec = 1;          // 1 second
-    tv.tv_usec = 0;         // no microseconds
+	tv.tv_sec = 1;          // 1 second
+	tv.tv_usec = 0;         // no microseconds
 	
 	memset(&hints, 0, sizeof(hints));
 	//hints.ai_family		= AF_UNSPEC;	// ipv6 then v4
